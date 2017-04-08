@@ -29,9 +29,11 @@
 	Event:FireClient('Unragdoll')
 --]]
 
--- So basically, server has to initiate unragdoll event since it has to run UnragdollServer code before 
+-- Basically, server has to initiate unragdoll event since it has to run UnragdollServer code before 
 -- client (otherwise camera will glitch for a frame), but you can send an event from client to initiate.
 -- If anyone finds a better way, let me know.
+
+-- Call PlayerRemoving(PlayerName) whenever a player leaves so there aren't any memory leaks.
 
 local Ragdoll, Unragdoll, RagdollServer, UnragdollServer, PlayerRemoving do
 	local JointParent = {}
