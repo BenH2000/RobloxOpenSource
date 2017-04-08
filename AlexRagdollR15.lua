@@ -29,8 +29,6 @@
 	Event:FireClient('Unragdoll')
 --]]
 
--- Call PlayerRemoving(PlayerName) whenever a player leaves so there aren't any memory leaks.
-
 -- So basically, server has to initiate unragdoll event since it has to run UnragdollServer code before 
 -- client (otherwise camera will glitch for a frame), but you can send an event from client to initiate.
 -- If anyone finds a better way, let me know.
@@ -183,6 +181,10 @@ local Ragdoll, Unragdoll, RagdollServer, UnragdollServer, PlayerRemoving do
 		if (not Humanoid) then return end
 		local HumanoidRootPart = Character:FindFirstChild('HumanoidRootPart')
 		if (not HumanoidRootPart) then return end
+		local UpperTorso = Character:FindFirstChild('UpperTorso')
+		if (not UpperTorso) then return end
+		UpperTorso.Velocity = HumanoidRootPart.Velocity * 3
+		UpperTorso.RotVelocity = HumanoidRootPart.Velocity * 0.5
 		local mJointParent = JointParent[PlayerName]
 		if (not mJointParent) then mJointParent = {} JointParent[PlayerName] = mJointParent end
 		Character.UpperTorso:SetNetworkOwner(Player)
@@ -214,7 +216,9 @@ local Ragdoll, Unragdoll, RagdollServer, UnragdollServer, PlayerRemoving do
 		if (not Humanoid) then return end
 		local HumanoidRootPart = Character:FindFirstChild('HumanoidRootPart')
 		if (not HumanoidRootPart) then return end
-		HumanoidRootPart.CFrame = Character['UpperTorso'].CFrame
+		local UpperTorso = Character:FindFirstChild('UpperTorso')
+		if (not UpperTorso) then return end
+		HumanoidRootPart.CFrame = UpperTorso.CFrame
 		HumanoidRootPart.Velocity = Vector3.new(0,0,0)
 		
 		for Motor,Parent in next,mJointParent do Motor.Parent = Parent end
