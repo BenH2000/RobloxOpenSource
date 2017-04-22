@@ -35,7 +35,7 @@
 
 -- Call PlayerRemoving(PlayerName) whenever a player leaves so there aren't any memory leaks.
 
-local Ragdoll, Unragdoll, RagdollServer, UnragdollServer, PlayerRemoving do
+local Ragdoll, Unragdoll, RagdollServer, UnragdollServer, PlayerRemoving, IsRagdoll do
 	local JointParent = {}
 	local function RagdollSetup(Character)
 		-- Neck
@@ -163,10 +163,15 @@ local Ragdoll, Unragdoll, RagdollServer, UnragdollServer, PlayerRemoving do
 	function Ragdoll(Character)
 		local Humanoid = Character:FindFirstChild('Humanoid')
 		if (not Humanoid) then return end
+		local HumanoidRootPart = Character:FindFirstChild('HumanoidRootPart')
+		if (not HumanoidRootPart) then return end
+		local UpperTorso = Character:FindFirstChild('UpperTorso')
+		if (not UpperTorso) then return end
 		local Camera = workspace.CurrentCamera
-		Camera.CameraSubject = Character['UpperTorso']
+		Camera.CameraSubject = UpperTorso
 		EnableHumanoid(Humanoid, false)
 		Humanoid:ChangeState(Enum.HumanoidStateType.FallingDown)
+		HumanoidRootPart.CanCollide = true
 	end
 	function Unragdoll(Character)
 		local Humanoid = Character:FindFirstChild('Humanoid')
@@ -179,6 +184,7 @@ local Ragdoll, Unragdoll, RagdollServer, UnragdollServer, PlayerRemoving do
 	function RagdollServer(Player)
 		local PlayerName = Player.Name
 		local Character = Player.Character
+		if (not Character) then return end
 		local Humanoid = Character:FindFirstChild('Humanoid')
 		if (not Humanoid) then return end
 		local HumanoidRootPart = Character:FindFirstChild('HumanoidRootPart')
@@ -189,7 +195,11 @@ local Ragdoll, Unragdoll, RagdollServer, UnragdollServer, PlayerRemoving do
 		UpperTorso.RotVelocity = HumanoidRootPart.Velocity * 0.5
 		local mJointParent = JointParent[PlayerName]
 		if (not mJointParent) then mJointParent = {} JointParent[PlayerName] = mJointParent end
-		Character.UpperTorso:SetNetworkOwner(Player)
+		if (not HumanoidRootPart.Anchored) then
+			pcall(function()
+				Character.UpperTorso:SetNetworkOwner(Player)
+			end)
+		end
 		for _,v in next,Character:GetChildren() do
 			if (v:IsA('BasePart')) then
 				for _,u in next,v:GetChildren() do
@@ -210,6 +220,7 @@ local Ragdoll, Unragdoll, RagdollServer, UnragdollServer, PlayerRemoving do
 	function UnragdollServer(Player)
 		local PlayerName = Player.Name
 		local Character = Player.Character
+		if (not Character) then return end
 		local RagdollNeck = Character:FindFirstChild('RagdollNeck')
 		if (not RagdollNeck) then return end
 		local mJointParent = JointParent[PlayerName]
@@ -236,5 +247,13 @@ local Ragdoll, Unragdoll, RagdollServer, UnragdollServer, PlayerRemoving do
 	function PlayerRemoving(PlayerName)
 		JointParent[PlayerName] = nil
 	end
+	function IsRagdoll(Player)
+		local Character = Player.Character
+		if (not Character) then return false end
+		local RagdollNeck = Character:FindFirstChild('RagdollNeck')
+		if (not RagdollNeck) then return false end
+		if (not RagdollNeck.Enabled) then return false end
+		return true
+	end
 end
-return { Ragdoll = Ragdoll, Unragdoll = Unragdoll, RagdollServer = RagdollServer, UnragdollServer = UnragdollServer, PlayerRemoving = PlayerRemoving }
+return { Ragdoll = Ragdoll, Unragdoll = Unragdoll, RagdollServer = RagdollServer, UnragdollServer = UnragdollServer, PlayerRemoving = PlayerRemoving, IsRagdoll = IsRagdoll }
