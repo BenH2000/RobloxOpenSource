@@ -26,7 +26,7 @@
 	
 	-- SERVER
 	Ragdoll.UnragdollServer()
-	Event:FireClient('Unragdoll')
+	Event:FireClient(Player, 'Unragdoll')
 --]]
 
 -- Basically, server has to initiate unragdoll event since it has to run UnragdollServer code before 
@@ -179,6 +179,7 @@ local Ragdoll, Unragdoll, RagdollServer, UnragdollServer, PlayerRemoving, IsRagd
 		local Camera = workspace.CurrentCamera
 		Camera.CameraSubject = Humanoid
 		EnableHumanoid(Humanoid, true)
+--		print('ok humanoid enabled')
 		Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
 	end
 	function RagdollServer(Player)
@@ -187,6 +188,7 @@ local Ragdoll, Unragdoll, RagdollServer, UnragdollServer, PlayerRemoving, IsRagd
 		if (not Character) then return end
 		local Humanoid = Character:FindFirstChild('Humanoid')
 		if (not Humanoid) then return end
+		if (Humanoid.Sit) then return end
 		local HumanoidRootPart = Character:FindFirstChild('HumanoidRootPart')
 		if (not HumanoidRootPart) then return end
 		local UpperTorso = Character:FindFirstChild('UpperTorso')
