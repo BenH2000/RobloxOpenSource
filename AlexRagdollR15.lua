@@ -179,7 +179,6 @@ local Ragdoll, Unragdoll, RagdollServer, UnragdollServer, PlayerRemoving, IsRagd
 		local Camera = workspace.CurrentCamera
 		Camera.CameraSubject = Humanoid
 		EnableHumanoid(Humanoid, true)
---		print('ok humanoid enabled')
 		Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
 	end
 	function RagdollServer(Player)
